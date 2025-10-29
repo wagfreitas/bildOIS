@@ -1,7 +1,10 @@
 # Multi-stage build for production
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
+
+# Update npm to latest version for better compatibility
+RUN npm install -g npm@latest
 
 # Copy package files
 COPY package*.json ./
@@ -9,7 +12,8 @@ COPY tsconfig*.json ./
 COPY nest-cli.json ./
 
 # Install all dependencies (including dev for build)
-RUN npm ci
+# Try npm ci first, fallback to npm install if lock file is out of sync
+RUN npm ci || (npm install && npm cache clean --force)
 
 # Copy source code
 COPY src ./src
@@ -18,7 +22,7 @@ COPY src ./src
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine AS production
+FROM node:20-alpine AS production
 
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init \
@@ -27,11 +31,15 @@ RUN apk add --no-cache dumb-init \
 
 WORKDIR /app
 
+# Update npm to latest version
+RUN npm install -g npm@latest
+
 # Copy package files
 COPY package*.json ./
 
 # Install only production dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Try npm ci first, fallback to npm install if lock file is out of sync
+RUN npm ci --only=production || (npm install --only=production && npm cache clean --force)
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
