@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Environment variables (não devem estar na imagem)
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Build artifacts (será gerado no build)
+dist/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+.Trashes
+Thumbs.db
+
+# Test and coverage
+coverage/
+test-results/
+*.test.ts
+*.spec.ts
+
+# Documentation
+docs/
+README.md
+
+# Docker files (não precisam estar na imagem)
+docker-compose.yml
+docker-compose.*.yml
+Dockerfile
+.dockerignore
+
+# Deployment scripts
+deploy-*.sh
+
+# PM2
+ecosystem.config.js
+
+# AWS deploy docs
+*.md

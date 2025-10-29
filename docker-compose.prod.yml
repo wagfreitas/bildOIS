@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  bild-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bild-api-oracle-fusion:latest
+    container_name: bild-api-oracle-fusion-prod
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+    restart: always
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - bild-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  bild-network:
+    driver: bridge
+

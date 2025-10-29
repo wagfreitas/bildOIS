@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  bild-api-oracle-fusion:
+    build: .
+    container_name: bild-api-oracle-fusion
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - ORACLE_BASE_URL=${ORACLE_BASE_URL}
+      - ORACLE_USERNAME=${ORACLE_USERNAME}
+      - ORACLE_PASSWORD=${ORACLE_PASSWORD}
+      - MASTER_ORG_CODE=${MASTER_ORG_CODE}
+      - DEFAULT_ITEM_CLASS=${DEFAULT_ITEM_CLASS:-Root Item Class}
+      - DEFAULT_STATUS=${DEFAULT_STATUS:-Active}
+      - DEFAULT_UOM=${DEFAULT_UOM:-Each}
+      - DEFAULT_LIFECYCLE=${DEFAULT_LIFECYCLE:-Production}
+      - API_VERSION=${API_VERSION:-11.13.18.05}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    volumes:
+      - ./logs:/app/logs
+      - ./.env:/app/.env:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - bild-network
+
+networks:
+  bild-network:
+    driver: bridge
