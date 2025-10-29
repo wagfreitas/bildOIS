@@ -120,6 +120,8 @@ coverage/
 # Documentation build
 docs/build/
 docs/
+.ebextensions/
+scripts/
 
 # Backup files
 *.bak
